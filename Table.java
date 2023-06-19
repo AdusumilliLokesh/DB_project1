@@ -272,10 +272,21 @@ public class Table
         out.println ("RA> " + name + ".minus (" + table2.name + ")");
         if (! compatible (table2)) return null;
 
-        List <Comparable []> rows = new ArrayList <> ();
+        List <Comparable []> rows = new ArrayList <> (); // store the resulting rows after the set difference operation
 
         //  T O   B E   I M P L E M E N T E D 
-
+        for (Comparable[] row1 : this.tuples) {//iterates each row in the current this.tuples table
+            boolean foundMatch = false;
+            for (Comparable[] otherRow : table2.tuples) {//iterates each row in the table2.tuples table
+                if (Arrays.equals(row1, otherRow)) {//checks if this.row in the current table is equal to the row in table2
+                    foundMatch = true;
+                    break;
+                }
+            }
+            if (!foundMatch) {
+                rows.add(row1);//if no match founded; row is added to the rows list
+            }
+        }
         return new Table (name + count++, attribute, domain, key, rows);
     } // minus
 
