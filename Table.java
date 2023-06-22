@@ -179,6 +179,18 @@ public class Table
         List <Comparable []> rows = new ArrayList <> ();
 
         //  T O   B E   I M P L E M E N T E D 
+       for (Comparable[] tuple : tuples) {
+            Comparable[] newRow = new Comparable[attrs.length];
+            int index = 0;
+            for (String attr : attrs) {
+                int attrIndex = Arrays.asList(attribute).indexOf(attr);
+                if (attrIndex != -1) {
+                    newRow[index] = tuple[attrIndex];
+                    index++;
+                }
+            }
+            rows.add(newRow);
+        }
 
         return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
@@ -216,6 +228,51 @@ public class Table
         List <Comparable []> rows = new ArrayList <> ();
 
         //  T O   B E   I M P L E M E N T E D
+       // Parsing
+        String[] tokens = condition.split("\\s+"); // Split by space
+        String attr = tokens[0]; // Attribute
+        String op = tokens[1]; // Operator
+        String value = tokens[2]; // Value
+
+        // Determine the attribute index
+        int attrIndex = Arrays.asList(attribute).indexOf(attr);
+
+        // For loop to iterate over tuples and apply the condition
+        // Iterate over tuples and apply the condition
+        for (Comparable[] tuple : tuples) {
+            Comparable attrValue = tuple[attrIndex];
+
+            // Compare the attribute value with the given value based on the operator
+            boolean satisfiesCondition = false;
+            switch (op) {
+                case "==":
+                    satisfiesCondition = attrValue.equals(Integer.parseInt(value));
+                    break;
+                case "!=":
+                    satisfiesCondition = !attrValue.equals(Integer.parseInt(value));
+                    break;
+                case "<":
+                    satisfiesCondition = attrValue.compareTo(Integer.parseInt(value)) < 0;
+                    break;
+                case "<=":
+                    satisfiesCondition = attrValue.compareTo(Integer.parseInt(value)) <= 0;
+                    break;
+                case ">":
+                    satisfiesCondition = attrValue.compareTo(Integer.parseInt(value)) > 0;
+                    break;
+                case ">=":
+                    satisfiesCondition = attrValue.compareTo(Integer.parseInt(value)) >= 0;
+                    break;
+                default:
+                    out.println("Invalid operator: " + op);
+                    break;
+            }
+
+            // If the tuple satisfies the condition, add it to the result
+            if (satisfiesCondition) {
+                rows.add(tuple);
+            }
+        }
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // select
