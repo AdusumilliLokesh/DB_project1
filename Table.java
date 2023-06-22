@@ -254,6 +254,17 @@ public class Table
         List <Comparable []> rows = new ArrayList <> ();
 
         //  T O   B E   I M P L E M E N T E D 
+               // Add tuples from the current table
+        for (Comparable[] tuple : tuples) {
+            rows.add(tuple);
+        }
+
+        // Add tuples from table2 if they are not already present
+        for (Comparable[] tuple : table2.tuples) {
+            if (!rows.contains(tuple)) {
+                rows.add(tuple);
+            }
+        }
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // union
