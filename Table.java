@@ -385,7 +385,7 @@ public class Table
         int l1 = t_attrs.length;
         int l2 = u_attrs.length;
         //  T O   B E   I M P L E M E N T E D
-        ArrayList<String> dups = new ArrayList<String>();
+        ArrayList<String> dups = new ArrayList<String>(); //STORES DUPLICATE ATTRIBUTES ACCORDING TO NAMES
         for(int i=0;i<l1 ; i++)
         {
             for(int j=0;j<l2;j++)
@@ -443,15 +443,11 @@ public class Table
     public Table join (String condition, Table table2)
     {
         out.println ("RA> " + name + ".join (" + condition + ", " + table2.name + ")");
-
         var rows = new ArrayList <Comparable []> ();
         //  T O   B E   I M P L E M E N T E D
-
         var atr = condition.split (" ");
-       // out.println(atr[0]+"  "+atr[1]+"  "+atr[2]);
         int t1a = Arrays.asList(this.attribute).indexOf(atr[0]);
         int t2a = Arrays.asList(table2.attribute).indexOf(atr[2]);
-        //out.println(t1a+ "   "+t2a);
         for (Comparable[] tup1 : this.tuples) {
             for (Comparable[] tup2 : table2.tuples)
             {
@@ -460,26 +456,26 @@ public class Table
                         if(tup1[t1a] == tup2[t2a])
                         rows.add(concat(tup1,tup2));
                         break;
-                   /* case "!=":
+                    case "!=":
                         if(tup1[t1a] != tup2[t2a])
                             rows.add(concat(tup1,tup2));
                         break;
                     case "<":
-                        if(tup1[t1a] < tup2[t2a])
+                        if(tup1[t1a].compareTo(tup2[t2a]) <0)
                             rows.add(concat(tup1,tup2));
                         break;
                     case "<=":
-                        if(tup1[t1a] <= tup2[t2a])
+                        if(tup1[t1a].compareTo(tup2[t2a]) <=0)
                             rows.add(concat(tup1,tup2));
                         break;
                     case ">":
-                        if(tup1[t1a] > tup2[t2a])
+                        if(tup1[t1a].compareTo(tup2[t2a]) >0)
                             rows.add(concat(tup1,tup2));
                         break;
                     case ">=":
-                        if(tup1[t1a] >= tup2[t2a])
+                        if(tup1[t1a].compareTo(tup2[t2a]) >=0)
                             rows.add(concat(tup1,tup2));
-                        break;*/
+                        break;
                     default:
                         out.println("Invalid operator: " + atr[1]);
                         break;
@@ -546,9 +542,7 @@ public class Table
     public Table join (Table table2)
     {
         out.println ("RA> " + name + ".join (" + table2.name + ")");
-
         var rows = new ArrayList <Comparable []> ();
-
       //  T O   B E   I M P L E M E N T E D
         // FIX - eliminate duplicate columns
         String[] t_attrs = new String[100];
@@ -557,7 +551,7 @@ public class Table
         u_attrs = table2.attribute;
         int l1 = t_attrs.length;
         int l2 = u_attrs.length;
-        String[] dups = new String[100];
+        String[] dups = new String[l1];
         int y = 0;
         String[] finalU_attrs = u_attrs;
         for(int i=0;i<l1 ; i++)
@@ -583,14 +577,14 @@ public class Table
                     int t2a = Arrays.asList(table2.attribute).indexOf(dups[i]);
                     ind[k++] = t2a;
                     //out.print(ind[0]);
-                    if(tup1[t1a]!=tup2[t2a])
+                    if(t1a!= -1 && t2a!=-1 && tup1[t1a]!=tup2[t2a])
                     {
                         flag = 0;
                     }
                 }
                 if(flag == 1)
                 {   int t=0;
-                    Comparable[] s2 = new  Comparable[tup2.length ];
+                    Comparable[] s2 = new  Comparable[tup2.length -y];
                     for(int j=0;j<tup2.length;j++)
                     {
                         if(!Arrays.toString(ind).contains(String.valueOf(j))) {
@@ -598,7 +592,7 @@ public class Table
                             s2[t++] = (tup2[j]);
                         }
                     }
-                    if(s2[0]==null)
+                    if(s2.length==0 ||s2[0]==null)
                         rows.add(tup1);
                     else
                     rows.add(concat(tup1,s2));
@@ -609,15 +603,15 @@ public class Table
         String[] s = new String[100];
         s = table2.attribute;
         int l4 = s.length;
-        String[] p = new String[l4];
-        String[] t = new String[l4];
+        String[] p = new String[l4-y];
+        String[] t = new String[attribute.length+l4-y];
         for(int i=0,k=0;i<l4;i++) {
             if (!Arrays.toString(dups).contains(s[i])){
                 p[k] = s[i];
                 k++;
             }
         }
-        if(p[0] == null)
+        if(p.length==0 || p[0] == null)
             t = attribute;
         else
             t = concat(attribute,p);
@@ -874,27 +868,4 @@ public class Table
 
         return obj;
     } // extractDom
-    public static void main(String[] args)
-    {
-        var T1 = new Table ("T1", "a1 a2 a3",
-                "Integer Integer Integer", "a1");
-        var T2 = new Table ("T2", "b1 b2 b3 a1",
-                "Integer Integer Integer Integer", "b1");
-        var v1 = new Comparable [] { 1,2,3 };
-        var v2 = new Comparable [] {8,5,6};
-
-        T1.insert(v1);
-        T1.insert(v2);
-        var v3 = new Comparable [] { 1,2,3,4 };
-        var v4 = new Comparable [] { 6,5,7,8 };
-        T2.insert(v3);
-        T2.insert(v4);
-
-        var T3 = T1.join("a1 a2","a1 b2",T2);
-        out.println(Arrays.toString(T3.attribute));
-        for (Comparable[] tup3 : T3.tuples)
-        {
-            out.println(Arrays.toString(tup3));
-         }
-    }
 } // Table class
