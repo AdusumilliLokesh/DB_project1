@@ -9,6 +9,10 @@ import java.io.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
+import java.util.HashMap;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.lang.Boolean.*;
 import static java.lang.System.arraycopy;
@@ -77,7 +81,7 @@ public class Table
     {
         return switch (mType) {
         case TREE_MAP    -> new TreeMap <> ();
-        case LINHASH_MAP -> new LinHashMap <> (KeyType.class, Comparable [].class);
+        case LINHASH_MAP -> new LinkedHashMap <> (); //(KeyType.class, Comparable [].class);
 //      case BPTREE_MAP  -> new BpTreeMap <> (KeyType.class, Comparable [].class);
         default          -> null;
         }; // switch
@@ -179,18 +183,6 @@ public class Table
         List <Comparable []> rows = new ArrayList <> ();
 
         //  T O   B E   I M P L E M E N T E D 
-       for (Comparable[] tuple : tuples) {
-            Comparable[] newRow = new Comparable[attrs.length];
-            int index = 0;
-            for (String attr : attrs) {
-                int attrIndex = Arrays.asList(attribute).indexOf(attr);
-                if (attrIndex != -1) {
-                    newRow[index] = tuple[attrIndex];
-                    index++;
-                }
-            }
-            rows.add(newRow);
-        }
 
         return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
@@ -228,51 +220,6 @@ public class Table
         List <Comparable []> rows = new ArrayList <> ();
 
         //  T O   B E   I M P L E M E N T E D
-       // Parsing
-        String[] tokens = condition.split("\\s+"); // Split by space
-        String attr = tokens[0]; // Attribute
-        String op = tokens[1]; // Operator
-        String value = tokens[2]; // Value
-
-        // Determine the attribute index
-        int attrIndex = Arrays.asList(attribute).indexOf(attr);
-
-        // For loop to iterate over tuples and apply the condition
-        // Iterate over tuples and apply the condition
-        for (Comparable[] tuple : tuples) {
-            Comparable attrValue = tuple[attrIndex];
-
-            // Compare the attribute value with the given value based on the operator
-            boolean satisfiesCondition = false;
-            switch (op) {
-                case "==":
-                    satisfiesCondition = attrValue.equals(Integer.parseInt(value));
-                    break;
-                case "!=":
-                    satisfiesCondition = !attrValue.equals(Integer.parseInt(value));
-                    break;
-                case "<":
-                    satisfiesCondition = attrValue.compareTo(Integer.parseInt(value)) < 0;
-                    break;
-                case "<=":
-                    satisfiesCondition = attrValue.compareTo(Integer.parseInt(value)) <= 0;
-                    break;
-                case ">":
-                    satisfiesCondition = attrValue.compareTo(Integer.parseInt(value)) > 0;
-                    break;
-                case ">=":
-                    satisfiesCondition = attrValue.compareTo(Integer.parseInt(value)) >= 0;
-                    break;
-                default:
-                    out.println("Invalid operator: " + op);
-                    break;
-            }
-
-            // If the tuple satisfies the condition, add it to the result
-            if (satisfiesCondition) {
-                rows.add(tuple);
-            }
-        }
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // select
@@ -310,18 +257,8 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
-               // Add tuples from the current table
-        for (Comparable[] tuple : tuples) {
-            rows.add(tuple);
-        }
+        //  T O   B E   I M P L E M E N T E D o
 
-        // Add tuples from table2 if they are not already present
-        for (Comparable[] tuple : table2.tuples) {
-            if (!rows.contains(tuple)) {
-                rows.add(tuple);
-            }
-        }
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // union
@@ -342,7 +279,7 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> (); // store the resulting rows after the set difference operation
 
-        //  T O   B E   I M P L E M E N T E D 
+        //  T O   B E   I M P L E M E N T E D
         for (Comparable[] row1 : this.tuples) {//iterates each row in the current this.tuples table
             boolean foundMatch = false;
             for (Comparable[] otherRow : table2.tuples) {//iterates each row in the table2.tuples table
@@ -376,14 +313,54 @@ public class Table
         out.println ("RA> " + name + ".join (" + attributes1 + ", " + attributes2 + ", "
                                                + table2.name + ")");
 
+
         var t_attrs = attributes1.split (" ");
         var u_attrs = attributes2.split (" ");
-        var rows    = new ArrayList <Comparable []> ();
-
-        //  T O   B E   I M P L E M E N T E D 
-
-        return new Table (name + count++, concat (attribute, table2.attribute),
-                                          concat (domain, table2.domain), key, rows);
+        int l1 = t_attrs.length;
+        int l2 = u_attrs.length;
+        //  T O   B E   I M P L E M E N T E D
+        ArrayList<String> dups = new ArrayList<String>();
+        for(int i=0;i<l1 ; i++)
+        {
+            for(int j=0;j<l2;j++)
+            {
+                if(t_attrs[i].equals(u_attrs[j]))
+                {   dups.add(t_attrs[i]);
+                }
+            }
+        }
+        List <Comparable []> rows1 = new ArrayList <> ();
+        int flag = 1;
+        for (Comparable[] tup1 : tuples) {
+            for (Comparable[] tup2 : table2.tuples)
+            {   flag = 1;
+               for(int i=0;i<l1;i++)
+               {
+                   int t1a = Arrays.asList(attribute).indexOf(t_attrs[i]);
+                   int t2a = Arrays.asList(table2.attribute).indexOf(u_attrs[i]);
+                   if(tup1[t1a]!=tup2[t2a])
+                   {
+                       flag = 0;
+                   }
+               }
+               if(flag == 1)
+               {
+                   rows1.add(concat(tup1,tup2));
+               }
+            }
+        }
+        String[] s = new String[100];
+        s = table2.attribute;
+        int l3 = s.length;
+        for(String dup : dups) {
+            for (int i = 0; i < l3; i++) {
+                if (s[i].equals(dup)) {
+                    s[i] = s[i] + "2";
+                }
+            }
+        }
+        return new Table (name + count++, concat (attribute,s ),
+                                          concat (domain, table2.domain), this.key, rows1);
     } // join
 
     /************************************************************************************
@@ -402,10 +379,57 @@ public class Table
         out.println ("RA> " + name + ".join (" + condition + ", " + table2.name + ")");
 
         var rows = new ArrayList <Comparable []> ();
-
         //  T O   B E   I M P L E M E N T E D
 
-        return new Table (name + count++, concat (attribute, table2.attribute),
+        var atr = condition.split (" ");
+       // out.println(atr[0]+"  "+atr[1]+"  "+atr[2]);
+        int t1a = Arrays.asList(this.attribute).indexOf(atr[0]);
+        int t2a = Arrays.asList(table2.attribute).indexOf(atr[2]);
+        //out.println(t1a+ "   "+t2a);
+        for (Comparable[] tup1 : this.tuples) {
+            for (Comparable[] tup2 : table2.tuples)
+            {
+                switch (atr[1]) {
+                    case "==":
+                        if(tup1[t1a] == tup2[t2a])
+                        rows.add(concat(tup1,tup2));
+                        break;
+                   /* case "!=":
+                        if(tup1[t1a] != tup2[t2a])
+                            rows.add(concat(tup1,tup2));
+                        break;
+                    case "<":
+                        if(tup1[t1a] < tup2[t2a])
+                            rows.add(concat(tup1,tup2));
+                        break;
+                    case "<=":
+                        if(tup1[t1a] <= tup2[t2a])
+                            rows.add(concat(tup1,tup2));
+                        break;
+                    case ">":
+                        if(tup1[t1a] > tup2[t2a])
+                            rows.add(concat(tup1,tup2));
+                        break;
+                    case ">=":
+                        if(tup1[t1a] >= tup2[t2a])
+                            rows.add(concat(tup1,tup2));
+                        break;*/
+                    default:
+                        out.println("Invalid operator: " + atr[1]);
+                        break;
+                }
+            }
+        }
+        String[] s = new String[100];
+        s = table2.attribute;
+        int l1 = s.length;
+        for(int i=0;i<l1;i++) {
+            if (s[i].equals(atr[2])) {
+                s[i] = s[i] + "2";
+            }
+        }
+
+        return new Table (name + count++, concat (attribute, s),
                                           concat (domain, table2.domain), key, rows);
     } // join
 
@@ -459,11 +483,83 @@ public class Table
 
         var rows = new ArrayList <Comparable []> ();
 
-        //  T O   B E   I M P L E M E N T E D 
-
+      //  T O   B E   I M P L E M E N T E D
         // FIX - eliminate duplicate columns
-        return new Table (name + count++, concat (attribute, table2.attribute),
+        String[] t_attrs = new String[100];
+        String[] u_attrs = new String[100];
+        t_attrs = attribute;
+        u_attrs = table2.attribute;
+        int l1 = t_attrs.length;
+        int l2 = u_attrs.length;
+        String[] dups = new String[100];
+        int y = 0;
+        String[] finalU_attrs = u_attrs;
+        for(int i=0;i<l1 ; i++)
+        {
+            for(int j=0;j<l2;j++)
+            {
+
+                int finalJ = j;
+                if(t_attrs[i].equals(u_attrs[j]) && !(Arrays.stream(dups).anyMatch(g -> g == finalU_attrs[finalJ])))
+                {   dups[y++] = u_attrs[j];
+                }
+            }
+        }
+        int flag = 1;
+        for (Comparable[] tup1 : tuples) {
+            for (Comparable[] tup2 : table2.tuples)
+            {   flag = 1;
+                int[] ind = new int[tup2.length];
+                int k=0;
+                for(int i=0;i<l1;i++)
+                {
+                    int t1a = Arrays.asList(attribute).indexOf(dups[i]);
+                    int t2a = Arrays.asList(table2.attribute).indexOf(dups[i]);
+                    ind[k++] = t2a;
+                    //out.print(ind[0]);
+                    if(tup1[t1a]!=tup2[t2a])
+                    {
+                        flag = 0;
+                    }
+                }
+                if(flag == 1)
+                {   int t=0;
+                    Comparable[] s2 = new  Comparable[tup2.length ];
+                    for(int j=0;j<tup2.length;j++)
+                    {
+                        if(!Arrays.toString(ind).contains(String.valueOf(j))) {
+                            out.println(Arrays.toString(ind) +"   "+j);
+                            s2[t++] = (tup2[j]);
+                        }
+                    }
+                    if(s2[0]==null)
+                        rows.add(tup1);
+                    else
+                    rows.add(concat(tup1,s2));
+                }
+            }
+        }
+
+        String[] s = new String[100];
+        s = table2.attribute;
+        int l4 = s.length;
+        String[] p = new String[l4];
+        String[] t = new String[l4];
+        for(int i=0,k=0;i<l4;i++) {
+            if (!Arrays.toString(dups).contains(s[i])){
+                p[k] = s[i];
+                k++;
+            }
+        }
+        if(p[0] == null)
+            t = attribute;
+        else
+            t = concat(attribute,p);
+
+        return new Table (name + count++, t,
                                           concat (domain, table2.domain), key, rows);
+
+
     } // join
 
     /************************************************************************************
@@ -712,6 +808,27 @@ public class Table
 
         return obj;
     } // extractDom
+    public static void main(String[] args)
+    {
+        var T1 = new Table ("T1", "a1 a2 a3",
+                "Integer Integer Integer", "a1");
+        var T2 = new Table ("T2", "b1 b2 b3 a1",
+                "Integer Integer Integer Integer", "b1");
+        var v1 = new Comparable [] { 1,2,3 };
+        var v2 = new Comparable [] {8,5,6};
 
+        T1.insert(v1);
+        T1.insert(v2);
+        var v3 = new Comparable [] { 1,2,3,4 };
+        var v4 = new Comparable [] { 6,5,7,8 };
+        T2.insert(v3);
+        T2.insert(v4);
+
+        var T3 = T1.join("a1 a2","a1 b2",T2);
+        out.println(Arrays.toString(T3.attribute));
+        for (Comparable[] tup3 : T3.tuples)
+        {
+            out.println(Arrays.toString(tup3));
+         }
+    }
 } // Table class
-
