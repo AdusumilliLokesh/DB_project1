@@ -2,8 +2,10 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Field;
 
 import static java.lang.System.out;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class JunitTest {
@@ -52,7 +54,10 @@ public class JunitTest {
         var expectedTuples = (ArrayList<Comparable[]>) tuplesField.get(expectedTable);
 
         // Verify the result is the same as expected
-        assertEquals(expectedTuples, resultTuples);
+        assertEquals(expectedTuples.size(), resultTuples.size());
+        for (int i = 0; i < expectedTuples.size(); i++) {
+            assertArrayEquals(expectedTuples.get(i), resultTuples.get(i));
+        }
     }
     
     @Test
@@ -64,7 +69,7 @@ public class JunitTest {
         // Create the cinema table
         var cinema = new Table("cinema", "title year length genre studioName producerNo",
                 "String Integer Integer String String Integer", "title year");
-
+        
         // Create the films
         var film0 = new Comparable[]{"Star_Wars", 1977, 124, "sciFi", "Fox", 12345};
         var film1 = new Comparable[]{"Star_Wars_2", 1980, 124, "sciFi", "Fox", 12345};
@@ -87,7 +92,7 @@ public class JunitTest {
         expectedTable.insert(film2);
         expectedTable.insert(film3);
         expectedTable.insert(film4);
-
+        
         // Perform the movie table union cinema table operation
         var result = movie.union(cinema);
 
@@ -100,51 +105,10 @@ public class JunitTest {
         var expectedTuples = (ArrayList<Comparable[]>) tuplesField.get(expectedTable);
 
         // Verify the result is the same as expected
-        assertEquals(expectedTuples, resultTuples);
-    }
-    @Test
-    public void testProject() throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-        // Create the employee table
-        var employee = new Table("employee", "id name department",
-                "Integer String String", "id");
-
-        // Create the employees
-        var employee0 = new Comparable[]{1, "John", "HR"};
-        var employee1 = new Comparable[]{2, "Jane", "Finance"};
-        var employee2 = new Comparable[]{3, "Mike", "Marketing"};
-
-        // Add employees to the employee table
-        employee.insert(employee0);
-        employee.insert(employee1);
-        employee.insert(employee2);
-
-        // Create the expected table with only "name" column
-        var expectedTable = new Table("employee", "name", "String", "id");
-
-        // Insert names into expectedTable
-        var expectedRow0 = new Comparable[]{"John"};
-        var expectedRow1 = new Comparable[]{"Jane"};
-        var expectedRow2 = new Comparable[]{"Mike"};
-
-        expectedTable.insert(expectedRow0);
-        expectedTable.insert(expectedRow1);
-        expectedTable.insert(expectedRow2);
-        expectedTable.print();
-
-        // Perform the employee table project operation
-        var result = employee.project("name");
-        result.print();
-
-        // Get access to the "tuples" field using reflection
-        Field tuplesField = Table.class.getDeclaredField("tuples");
-        tuplesField.setAccessible(true);
-
-        // Get the tuples list from the result and expected tables
-        var resultTuples = (ArrayList<Comparable[]>) tuplesField.get(result);
-        var expectedTuples = (ArrayList<Comparable[]>) tuplesField.get(expectedTable);
-
-        // Verify the result is the same as expected
-        assertEquals(expectedTuples, resultTuples);
+        assertEquals(expectedTuples.size(), resultTuples.size());
+        for (int i = 0; i < expectedTuples.size(); i++) {
+            assertArrayEquals(expectedTuples.get(i), resultTuples.get(i));
+        }
     }
     
     @Test
@@ -197,8 +161,14 @@ public class JunitTest {
         var expectedTuples2 = (ArrayList<Comparable[]>) tuplesField.get(expectedTable2);
         
         // Verify the result is the same as expected
-        assertEquals(expectedTuples, resultTuples);
-        assertEquals(expectedTuples2, resultTuples2);
+        assertEquals(expectedTuples.size(), resultTuples.size());
+        for (int i = 0; i < expectedTuples.size(); i++) {
+            assertArrayEquals(expectedTuples.get(i), resultTuples.get(i));
+        }
+        assertEquals(expectedTuples2.size(), resultTuples2.size());
+        for (int i = 0; i < expectedTuples2.size(); i++) {
+            assertArrayEquals(expectedTuples2.get(i), resultTuples2.get(i));
+        }
     }
     
     @Test
@@ -247,12 +217,9 @@ public class JunitTest {
         expectedTable.insert(expectedRow0);
         expectedTable.insert(expectedRow1);
         expectedTable.insert(expectedRow2);
-        expectedTable.print();
 
         // Perform the join operation
         var result = employee.join("id", "id", project);
-
-        result.print();
 
         // Get access to the "tuples" field using reflection
         Field tuplesField = Table.class.getDeclaredField("tuples");
@@ -263,7 +230,55 @@ public class JunitTest {
         var expectedTuples = (ArrayList<Comparable[]>) tuplesField.get(expectedTable);
 
         // Verify the result is the same as expected
-        assertEquals(expectedTuples, resultTuples);
+        assertEquals(expectedTuples.size(), resultTuples.size());
+        for (int i = 0; i < expectedTuples.size(); i++) {
+        	assertArrayEquals(expectedTuples.get(i), resultTuples.get(i));
+        }
+    }
+    @Test
+    public void testProject() throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+        // Create the employee table
+        var employee = new Table("employee", "id name department",
+                "Integer String String", "id");
+
+        // Create the employees
+        var employee0 = new Comparable[]{1, "John", "HR"};
+        var employee1 = new Comparable[]{2, "Jane", "Finance"};
+        var employee2 = new Comparable[]{3, "Mike", "Marketing"};
+
+        // Add employees to the employee table
+        employee.insert(employee0);
+        employee.insert(employee1);
+        employee.insert(employee2);
+
+        // Create the expected table with only "name" column
+        var expectedTable = new Table("employee", "name", "String", "id");
+
+        // Insert names into expectedTable
+        var expectedRow0 = new Comparable[]{"John"};
+        var expectedRow1 = new Comparable[]{"Jane"};
+        var expectedRow2 = new Comparable[]{"Mike"};
+
+        expectedTable.insert(expectedRow0);
+        expectedTable.insert(expectedRow1);
+        expectedTable.insert(expectedRow2);
+
+
+        // Perform the employee table project operation
+        var result = employee.project("name");
+
+        // Get access to the "tuples" field using reflection
+        Field tuplesField = Table.class.getDeclaredField("tuples");
+        tuplesField.setAccessible(true);
+
+        // Get the tuples list from the result and expected tables
+        var resultTuples = (ArrayList<Comparable[]>) tuplesField.get(result);
+        var expectedTuples = (ArrayList<Comparable[]>) tuplesField.get(expectedTable);
+
+        // Verify the result is the same as expected
+        assertEquals(expectedTuples.size(), resultTuples.size());
+        for (int i = 0; i < expectedTuples.size(); i++) {
+            assertArrayEquals(expectedTuples.get(i), resultTuples.get(i));
+        }
     }
 }
-
