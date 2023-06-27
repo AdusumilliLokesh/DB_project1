@@ -1,11 +1,9 @@
 import org.junit.jupiter.api.Test;
 import java.lang.reflect.Field;
 
-import static java.lang.System.out;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 
 public class JunitTest {
@@ -282,3 +280,4 @@ public class JunitTest {
         }
     }
 }
+
