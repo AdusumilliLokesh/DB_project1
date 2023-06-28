@@ -485,10 +485,13 @@ public class Table
             }
         }
         String[] s = new String[100];
+        String[] s2 = attribute;
         s = table2.attribute;
-        int l1 = s.length;
+        int l1 = s2.length;
+        int l3 = s.length;
         for(int i=0;i<l1;i++) {
-            if (s[i].equals(atr[2])) {
+            for(int j=0;j<l3;j++)
+            if (s2[i].equals(s[j])) {
                 s[i] = s[i] + "2";
             }
         }
