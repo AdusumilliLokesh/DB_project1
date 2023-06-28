@@ -1,3 +1,4 @@
+package implement;
 import org.junit.jupiter.api.Test;
 import java.lang.reflect.Field;
 
@@ -7,7 +8,6 @@ import java.util.ArrayList;
 
 
 public class JunitTest {
-
     @Test
     public void testMinus() throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         // Create the movie table
@@ -23,7 +23,7 @@ public class JunitTest {
         var film1 = new Comparable[]{"Star_Wars_2", 1980, 124, "sciFi", "Fox", 12345};
         var film2 = new Comparable[]{"Rocky", 1985, 200, "action", "Universal", 12125};
         var film3 = new Comparable[]{"Rambo", 1978, 100, "action", "Universal", 32355};
-        var film4 = new Comparable [] { "Galaxy_Quest", 1999, 104, "comedy", "DreamWorks", 67890 };
+        var film4 = new Comparable [] {"Galaxy_Quest", 1999, 104, "comedy", "DreamWorks", 67890};
 
         // Add films to movie and cinema tables
         movie.insert(film0);
@@ -171,54 +171,85 @@ public class JunitTest {
     
     @Test
     public void testJoin() throws NoSuchFieldException, IllegalAccessException {
-        // Create the employee table
-        var employee = new Table("employee", "id name department",
-                "Integer String String", "id");
+        // Create the movie table
+        var movie = new Table("movie", "title year length genre studioName producerNo",
+                "String Integer Integer String String Integer", "title year");
 
-        // Create the project table
-        var project = new Table("project", "id name duration",
-                "Integer String Integer", "id");
-
-        // Create the department table
-        var department = new Table("department", "name manager",
-                "String String", "name");
-
+        // Create the cinema table
+        var cinema = new Table("cinema", "title year length genre studioName producerNo",
+                "String Integer Integer String String Integer", "title year");
+        
+        var studio = new Table ("studio", "name address presNo",
+                "String String Integer", "name");
+        
         // Create the employees
-        var employee0 = new Comparable[]{1, "John", "HR"};
-        var employee1 = new Comparable[]{2, "Jane", "Finance"};
-        var employee2 = new Comparable[]{3, "Mike", "Marketing"};
+        var film0 = new Comparable [] { "Star_Wars", 1977, 124, "sciFi", "Fox", 12345 };
+        var film1 = new Comparable [] { "Star_Wars_2", 1980, 124, "sciFi", "Fox", 12345 };
+        var film2 = new Comparable [] { "Rocky", 1985, 200, "action", "Universal", 12125 };
+        var film3 = new Comparable [] { "Rambo", 1978, 100, "action", "Universal", 32355 };
+        var film4 = new Comparable [] { "Galaxy_Quest", 1999, 104, "comedy", "DreamWorks", 67890 };
 
         // Create the projects
-        var project0 = new Comparable[]{1, "ProjectA", 10};
-        var project1 = new Comparable[]{2, "ProjectB", 15};
-        var project2 = new Comparable[]{3, "ProjectC", 20};
+        var studio0 = new Comparable [] { "Fox", "Los_Angeles", 7777 };
+        var studio1 = new Comparable [] { "Universal", "Universal_City", 8888 };
+        var studio2 = new Comparable [] { "DreamWorks", "Universal_City", 9999 };
 
         // Add employees to employee table
-        employee.insert(employee0);
-        employee.insert(employee1);
-        employee.insert(employee2);
+        movie.insert (film0);
+        movie.insert (film1);
+        movie.insert (film2);
+        movie.insert (film3);
 
         // Add projects to project table
-        project.insert(project0);
-        project.insert(project1);
-        project.insert(project2);
+        cinema.insert (film2);
+        cinema.insert (film3);
+        cinema.insert (film4);
 
+        studio.insert (studio0);
+        studio.insert (studio1);
+        studio.insert (studio2);
+        
         // Create the expected table with joined columns
-        var expectedTable = new Table("expected employee JOIN project", "id name department id2 name duration",
-                "Integer String String Integer String Integer", "id");
+        var expectedTable = new Table("movie", "title year length genre studioName producerNo name address presNo",
+                "String Integer Integer String String Integer String Integer", "name title year");
 
         // Insert data into expectedTable with joined columns
-        var expectedRow0 = new Comparable[]{1, "John", "HR", 1, "ProjectA", 10};
-        var expectedRow1 = new Comparable[]{2, "Jane", "Finance", 2, "ProjectB", 15};
-        var expectedRow2 = new Comparable[]{3, "Mike", "Marketing", 3, "ProjectC", 20};
+        var expectedRow0 = new Comparable[]{"Star_Wars", 1977, 124, "sciFi", "Fox", 12345, "Fox", "Los_Angeles", 7777};
+        var expectedRow1 = new Comparable[]{"Star_Wars_2", 1980, 124, "sciFi", "Fox", 12345, "Fox","Los_Angeles", 7777};
+        var expectedRow2 = new Comparable[]{"Rocky", 1985, 200, "action", "Universal", 12125, "Universal","Universal_City", 8888};
+        var expectedRow3 = new Comparable[]{"Rambo", 1978, 100, "action", "Universal", 32355, "Universal","Universal_City", 8888};
 
         expectedTable.insert(expectedRow0);
         expectedTable.insert(expectedRow1);
         expectedTable.insert(expectedRow2);
+        expectedTable.insert(expectedRow3);
 
+        //Create the expected2 Table
+        var expectedTable2 = new Table("expected2 Movie", "title year length genre studioName producerNo", 
+        		"String Integer Integer String String Integer","title year");
+        
+        var expected2Row0 = new Comparable [] { "Rocky", 1985, 200, "action", "Universal", 12125 };
+        var expected2Row2 = new Comparable [] { "Rambo", 1978, 100, "action", "Universal", 32355 };
+        
+        expectedTable2.insert(expected2Row0);
+        expectedTable2.insert(expected2Row2);
+        
+        var expectedTable3 = new Table("expected3 Movie", "title year length genre studioName producerNo title2 year2 length2 genre2 studioName2 producerNo2", 
+        		"String Integer Integer String String Integer String Integer Integer String String Integer","title year");
+        
+        var expected3Row0 = new Comparable [] {"Rocky", 1985, 200, "action", "Universal", 12125, "Rocky", 1985, 200, "action", "Universal", 12125};
+        var expected3Row2 = new Comparable [] {"Rambo", 1978, 100, "action", "Universal", 32355, "Rambo", 1978, 100, "action", "Universal", 32355};
+        
+        expectedTable3.insert(expected3Row0);
+        expectedTable3.insert(expected3Row2);
+        
+        expectedTable3.print();
         // Perform the join operation
-        var result = employee.join("id", "id", project);
+        var result = movie.join("studioName", "name", studio);
+        var result2 = movie.join (cinema);
+        var result3 = movie.join("year == year", cinema);
 
+        result3.print();
         // Get access to the "tuples" field using reflection
         Field tuplesField = Table.class.getDeclaredField("tuples");
         tuplesField.setAccessible(true);
@@ -226,13 +257,28 @@ public class JunitTest {
         // Get the tuples list from the result and expected tables
         var resultTuples = (ArrayList<Comparable[]>) tuplesField.get(result);
         var expectedTuples = (ArrayList<Comparable[]>) tuplesField.get(expectedTable);
-
+        var resultTuples2 = (ArrayList<Comparable[]>) tuplesField.get(result2);
+        var expectedTuples2 = (ArrayList<Comparable[]>) tuplesField.get(expectedTable2);
+        var resultTuples3 = (ArrayList<Comparable[]>) tuplesField.get(result3);
+        var expectedTuples3 = (ArrayList<Comparable[]>) tuplesField.get(expectedTable3);
+        
         // Verify the result is the same as expected
         assertEquals(expectedTuples.size(), resultTuples.size());
         for (int i = 0; i < expectedTuples.size(); i++) {
         	assertArrayEquals(expectedTuples.get(i), resultTuples.get(i));
         }
+        // Verify the result2 is the same as expected
+        assertEquals(expectedTuples2.size(), resultTuples2.size());
+        for (int i = 0; i < expectedTuples2.size(); i++) {
+        	assertArrayEquals(expectedTuples2.get(i), resultTuples2.get(i));
+        }
+        // Verify the result2 is the same as expected
+        assertEquals(expectedTuples3.size(), resultTuples3.size());
+        for (int i = 0; i < expectedTuples3.size(); i++) {
+        	assertArrayEquals(expectedTuples3.get(i), resultTuples3.get(i));
+        }
     }
+    
     @Test
     public void testProject() throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         // Create the employee table
@@ -260,7 +306,6 @@ public class JunitTest {
         expectedTable.insert(expectedRow0);
         expectedTable.insert(expectedRow1);
         expectedTable.insert(expectedRow2);
-
 
         // Perform the employee table project operation
         var result = employee.project("name");
