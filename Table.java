@@ -415,14 +415,15 @@ public class Table
                }
             }
         }
-        String[] s = new String[100];
+      String[] s = new String[100];
         s = table2.attribute;
-        int l3 = s.length;
-        for(String dup : dups) {
-            for (int i = 0; i < l3; i++) {
-                if (s[i].equals(dup)) {
+        String[] s1 = attribute;
+        int l1 = s1.length;
+        int l = s.length;
+        for(int i=0;i<l1;i++) {
+            for(int j=0;j<l;j++)
+                if (s1[i].equals(s[j])) {
                     s[i] = s[i] + "2";
-                }
             }
         }
         return new Table (name + count++, concat (attribute,s ),
