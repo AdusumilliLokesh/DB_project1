@@ -418,9 +418,9 @@ public class Table
       String[] s = new String[100];
         s = table2.attribute;
         String[] s1 = attribute;
-        int l1 = s1.length;
+        int l3 = s1.length;
         int l = s.length;
-        for(int i=0;i<l1;i++) {
+        for(int i=0;i<l3;i++) {
             for(int j=0;j<l;j++)
                 if (s1[i].equals(s[j])) {
                     s[i] = s[i] + "2";
