@@ -427,7 +427,8 @@ public class Table
         }
         return new Table (name + count++, concat (attribute,s ),
                                           concat (domain, table2.domain), this.key, rows1);
-    } // join
+    }
+       // join
 
     /************************************************************************************
      * Join this table and table2 by performing a "theta-join".  Tuples from both tables
@@ -440,7 +441,7 @@ public class Table
      * @param table2     the rhs table in the join operation
      * @return  a table with tuples satisfying the condition
      */
-    public Table join (String condition, Table table2)
+     public Table join (String condition, Table table2)
     {
         out.println ("RA> " + name + ".join (" + condition + ", " + table2.name + ")");
         var rows = new ArrayList <Comparable []> ();
@@ -493,7 +494,8 @@ public class Table
 
         return new Table (name + count++, concat (attribute, s),
                                           concat (domain, table2.domain), key, rows);
-    } // join
+    }
+       // join
 
     /************************************************************************************
      * Join this table and table2 by performing an "equi-join".  Same as above equi-join,
@@ -620,7 +622,8 @@ public class Table
                                           concat (domain, table2.domain), key, rows);
 
 
-    } // join
+    }
+       // join
 
     /************************************************************************************
      * Return the column position for the given attribute name or -1 if not found.
